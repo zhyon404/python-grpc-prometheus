@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='python_grpc_prometheus',
-      version='0.1.0',
+      version='0.1.1',
       description='Python gRPC Prometheus Interceptors',
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -17,6 +17,6 @@ setup(name='python_grpc_prometheus',
           'setuptools==39.0.1',
           'prometheus_client==0.3.1'
       ],
-      licence='MIT',
+      license='MIT',
       packages=find_packages(exclude=["tests.*", "tests"]),
       )
