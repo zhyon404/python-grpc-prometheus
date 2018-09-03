@@ -63,12 +63,20 @@ class PromServerInterceptor(grpc.ServerInterceptor):
                 start = default_timer()
                 try:
                     rsp = behavior(request_or_iterator, service_context)
-                    SERVER_HANDLED_COUNTER.labels(
-                        grpc_type=grpc_type,
-                        grpc_service=grpc_service,
-                        grpc_method=grpc_method,
-                        grpc_code=code_to_string(service_context._state.code)
-                    ).inc()
+                    if service_context._state.code is None:
+                        SERVER_HANDLED_COUNTER.labels(
+                            grpc_type=grpc_type,
+                            grpc_service=grpc_service,
+                            grpc_method=grpc_method,
+                            grpc_code=code_to_string(grpc.StatusCode.OK)
+                        ).inc()
+                    else:
+                        SERVER_HANDLED_COUNTER.labels(
+                            grpc_type=grpc_type,
+                            grpc_service=grpc_service,
+                            grpc_method=grpc_method,
+                            grpc_code=code_to_string(service_context._state.code)
+                        ).inc()
                     return rsp
                 except grpc.RpcError as e:
                     if isinstance(e, grpc.Call):
@@ -77,6 +85,13 @@ class PromServerInterceptor(grpc.ServerInterceptor):
                             grpc_service=grpc_service,
                             grpc_method=grpc_method,
                             grpc_code=code_to_string(e.code())
+                        ).inc()
+                    else:
+                        SERVER_HANDLED_COUNTER.labels(
+                            grpc_type=grpc_type,
+                            grpc_service=grpc_service,
+                            grpc_method=grpc_method,
+                            grpc_code=code_to_string(grpc.StatusCode.UNKNOWN)
                         ).inc()
                     raise e
                 finally:

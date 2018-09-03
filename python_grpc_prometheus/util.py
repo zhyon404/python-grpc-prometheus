@@ -39,6 +39,8 @@ GRPC_STATUS_CODE_TO_STRING = {
 
 
 def code_to_string(code):
+    if code is None:
+        return None
     s = GRPC_STATUS_CODE_TO_STRING.get(code)
     if s:
         return s
