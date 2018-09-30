@@ -14,8 +14,8 @@ setup(name='python_grpc_prometheus',
       author_email='yongzhang1@foxmail.com',
       url="https://github.com/zhyon404/python-grpc-prometheus",
       install_requires=[
-          'setuptools==39.0.1',
-          'prometheus_client==0.3.1'
+          'setuptools>=39.0.1',
+          'prometheus_client>=0.3.1'
       ],
       license='MIT',
       packages=find_packages(exclude=["tests.*", "tests"]),
