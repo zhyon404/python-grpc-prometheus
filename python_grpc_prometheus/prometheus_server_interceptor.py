@@ -110,10 +110,6 @@ class PromServerInterceptor(grpc.ServerInterceptor):
 
 class ServiceLatencyInterceptor(grpc.ServerInterceptor):
 
-    # TODO rm no-op
-    def __init__(self):
-        pass
-
     def intercept_service(self, continuation, handler_call_details):
         # TODO see above
         client_call_method = handler_call_details.method
