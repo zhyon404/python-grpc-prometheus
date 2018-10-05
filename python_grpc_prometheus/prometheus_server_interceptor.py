@@ -35,8 +35,16 @@ def _wrap_rpc_behavior(handler, fn):
                            response_serializer=handler.response_serializer)
 
 
-class PromServerInterceptor(grpc.ServerInterceptor):
+def split_call_details(handler_call_details, minimum_grpc_method_path_items=3):
+    parts = handler_call_details.method.split("/")
+    if len(parts) < minimum_grpc_method_path_items:
+        return '', '', False
 
+    grpc_service, grpc_method = parts[1:minimum_grpc_method_path_items]
+    return grpc_service, grpc_method, True
+
+
+class PromServerInterceptor(grpc.ServerInterceptor):
     def intercept_service(self, continuation, handler_call_details):
 
         handler = continuation(handler_call_details)
@@ -45,15 +53,10 @@ class PromServerInterceptor(grpc.ServerInterceptor):
         if handler.request_streaming or handler.response_streaming:
             return handler
 
-        # TODO ss = handler_call_details.method.split("/")
-        client_call_method = handler_call_details.method
-        ss = client_call_method.split("/")
-        if len(ss) < 3:
+        grpc_service, grpc_method, ok = split_call_details(handler_call_details)
+        if not ok:
             return continuation(handler_call_details)
 
-        # TODO grpc_service, grpc_method = ss[1:3]
-        grpc_service = ss[1]
-        grpc_method = ss[2]
         grpc_type = type_from_method(handler.request_streaming, handler.response_streaming)
 
         SERVER_STARTED_COUNTER.labels(
@@ -111,17 +114,10 @@ class PromServerInterceptor(grpc.ServerInterceptor):
 class ServiceLatencyInterceptor(grpc.ServerInterceptor):
 
     def intercept_service(self, continuation, handler_call_details):
-        # TODO see above
-        client_call_method = handler_call_details.method
-        parts = client_call_method.split("/")
 
-        # TODO
-        # if len(parts) < 3:
-        # TODO ?
-        #     return continuation(handler_call_details)
-
-        grpc_service = parts[1]
-        grpc_method = parts[2]
+        grpc_service, grpc_method, ok = split_call_details(handler_call_details)
+        if not ok:
+            return continuation(handler_call_details)
 
         def latency_wrapper(behavior, request_streaming, response_streaming):
             def new_behavior(request_or_iterator, service_context):
