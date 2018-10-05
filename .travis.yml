@@ -12,6 +12,3 @@ script:
   - "nosetests -c nose.cfg"
 after_script:
   - "coveralls"
-notifications:
-  email:
-    - marthjod@gmail.com
