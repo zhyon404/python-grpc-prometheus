@@ -3,12 +3,12 @@ import time
 
 from timeit import default_timer
 
-from .server_metrics import SERVER_HANDLED_LATENCY_SECONDS
-from .server_metrics import SERVER_HANDLED_COUNTER
-from .server_metrics import SERVER_STARTED_COUNTER
+from python_grpc_prometheus.server_metrics import SERVER_HANDLED_LATENCY_SECONDS
+from python_grpc_prometheus.server_metrics import SERVER_HANDLED_COUNTER
+from python_grpc_prometheus.server_metrics import SERVER_STARTED_COUNTER
 
-from .util import type_from_method
-from .util import code_to_string
+from python_grpc_prometheus.util import type_from_method
+from python_grpc_prometheus.util import code_to_string
 
 
 def _wrap_rpc_behavior(handler, fn):
@@ -35,8 +35,16 @@ def _wrap_rpc_behavior(handler, fn):
                            response_serializer=handler.response_serializer)
 
 
-class PromServerInterceptor(grpc.ServerInterceptor):
+def split_call_details(handler_call_details, minimum_grpc_method_path_items=3):
+    parts = handler_call_details.method.split("/")
+    if len(parts) < minimum_grpc_method_path_items:
+        return '', '', False
 
+    grpc_service, grpc_method = parts[1:minimum_grpc_method_path_items]
+    return grpc_service, grpc_method, True
+
+
+class PromServerInterceptor(grpc.ServerInterceptor):
     def intercept_service(self, continuation, handler_call_details):
 
         handler = continuation(handler_call_details)
@@ -45,12 +53,10 @@ class PromServerInterceptor(grpc.ServerInterceptor):
         if handler.request_streaming or handler.response_streaming:
             return handler
 
-        client_call_method = handler_call_details.method
-        ss = client_call_method.split("/")
-        if len(ss) < 3:
+        grpc_service, grpc_method, ok = split_call_details(handler_call_details)
+        if not ok:
             return continuation(handler_call_details)
-        grpc_service = ss[1]
-        grpc_method = ss[2]
+
         grpc_type = type_from_method(handler.request_streaming, handler.response_streaming)
 
         SERVER_STARTED_COUNTER.labels(
@@ -107,14 +113,11 @@ class PromServerInterceptor(grpc.ServerInterceptor):
 
 class ServiceLatencyInterceptor(grpc.ServerInterceptor):
 
-    def __init__(self):
-        pass
-
     def intercept_service(self, continuation, handler_call_details):
-        client_call_method = handler_call_details.method
-        parts = client_call_method.split("/")
-        grpc_service = parts[1]
-        grpc_method = parts[2]
+
+        grpc_service, grpc_method, ok = split_call_details(handler_call_details)
+        if not ok:
+            return continuation(handler_call_details)
 
         def latency_wrapper(behavior, request_streaming, response_streaming):
             def new_behavior(request_or_iterator, service_context):

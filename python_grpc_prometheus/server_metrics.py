@@ -1,6 +1,7 @@
 from prometheus_client import Counter
 from prometheus_client import Histogram
 
+
 SERVER_STARTED_COUNTER = Counter(
     'grpc_server_started_total',
     'Total number of RPCs started on the server.',
