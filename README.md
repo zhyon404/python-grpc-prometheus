@@ -1,6 +1,6 @@
 # python-grpc-prometheus
 
-<a href="https://travis-ci.org/golang/dep"><img src="https://travis-ci.org/zhyon404/python-grpc-prometheus.svg?branch=master" alt="Build Status"></img></a>
+<a href="https://travis-ci.org/zhyon404/python-grpc-prometheus"><img src="https://travis-ci.org/zhyon404/python-grpc-prometheus.svg?branch=master" alt="Build Status"></img></a>
 
 
 ## ChangeLog
