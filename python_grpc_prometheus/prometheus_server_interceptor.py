@@ -70,37 +70,25 @@ class PromServerInterceptor(grpc.ServerInterceptor):
                 try:
                     rsp = behavior(request_or_iterator, service_context)
                     if service_context._state.code is None:
-                        SERVER_HANDLED_COUNTER.labels(
-                            grpc_type=grpc_type,
-                            grpc_service=grpc_service,
-                            grpc_method=grpc_method,
-                            grpc_code=code_to_string(grpc.StatusCode.OK)
-                        ).inc()
+                        code = code_to_string(grpc.StatusCode.OK)
                     else:
-                        SERVER_HANDLED_COUNTER.labels(
-                            grpc_type=grpc_type,
-                            grpc_service=grpc_service,
-                            grpc_method=grpc_method,
-                            grpc_code=code_to_string(service_context._state.code)
-                        ).inc()
+                        code = code_to_string(service_context._state.code)
                     return rsp
                 except grpc.RpcError as e:
                     if isinstance(e, grpc.Call):
-                        SERVER_HANDLED_COUNTER.labels(
-                            grpc_type=grpc_type,
-                            grpc_service=grpc_service,
-                            grpc_method=grpc_method,
-                            grpc_code=code_to_string(e.code())
-                        ).inc()
+                        code = code_to_string(e.code())
                     else:
-                        SERVER_HANDLED_COUNTER.labels(
-                            grpc_type=grpc_type,
-                            grpc_service=grpc_service,
-                            grpc_method=grpc_method,
-                            grpc_code=code_to_string(grpc.StatusCode.UNKNOWN)
-                        ).inc()
+                        code = code_to_string(grpc.StatusCode.UNKNOWN)
+
                     raise e
                 finally:
+                    SERVER_HANDLED_COUNTER.labels(
+                        grpc_type=grpc_type,
+                        grpc_service=grpc_service,
+                        grpc_method=grpc_method,
+                        grpc_code=code
+                    ).inc()
+
                     SERVER_HANDLED_LATENCY_SECONDS.labels(
                         grpc_type=grpc_type,
                         grpc_service=grpc_service,
