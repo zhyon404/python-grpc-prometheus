@@ -75,6 +75,9 @@ class PromServerInterceptor(grpc.ServerInterceptor):
                     grpc_method=grpc_method
                 ).inc()
 
+                # default
+                code = code_to_string(grpc.StatusCode.UNKNOWN)
+
                 try:
                     rsp = behavior(request_or_iterator, service_context)
                     if service_context._state.code is None:
@@ -92,8 +95,6 @@ class PromServerInterceptor(grpc.ServerInterceptor):
                 except grpc.RpcError as e:
                     if isinstance(e, grpc.Call):
                         code = code_to_string(e.code())
-                    else:
-                        code = code_to_string(grpc.StatusCode.UNKNOWN)
 
                     raise e
                 finally:
