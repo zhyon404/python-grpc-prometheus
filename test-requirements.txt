@@ -2,3 +2,6 @@ coverage
 nose
 parameterized
 rednose
+aiohttp
+requests
+protobuf
