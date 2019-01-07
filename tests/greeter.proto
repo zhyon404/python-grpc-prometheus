@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+// taken from https://grpc.io/docs/quickstart/python.html
+
+// pip install grpcio grpcio-tools
+// python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. greeter.proto
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}

@@ -2,3 +2,5 @@ coverage
 nose
 parameterized
 rednose
+requests
+protobuf
