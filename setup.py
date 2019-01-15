@@ -10,7 +10,7 @@ with open('requirements.txt', 'r') as f:
     requirements = f.read().split()
 
 setup(name='python_grpc_prometheus',
-      version='0.1.3',
+      version='0.1.5',
       description='Python gRPC Prometheus Interceptors',
       long_description=long_description,
       long_description_content_type="text/markdown",
