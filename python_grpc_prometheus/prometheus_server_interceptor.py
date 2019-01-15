@@ -49,6 +49,8 @@ class PromServerInterceptor(grpc.ServerInterceptor):
     def intercept_service(self, continuation, handler_call_details):
 
         handler = continuation(handler_call_details)
+        if handler is None:
+            return handler
 
         # only support unary
         if handler.request_streaming or handler.response_streaming:

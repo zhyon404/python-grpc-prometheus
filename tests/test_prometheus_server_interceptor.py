@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_is_none
 from parameterized import parameterized
 
 import requests
@@ -44,6 +44,11 @@ class TestPrometheusServerInterceptor(TestCase):
         self.psi.intercept_service(mock_continuation, mock_handler_call_details)
         assert_equal(2, mock_continuation.call_count)
 
+    def test_none_handler(self):
+        mock_continuation = Mock(return_value=None)
+
+        ret = self.psi.intercept_service(mock_continuation, Mock())
+        assert_is_none(ret)
 
 class TestServiceLatencyInterceptor(TestCase):
     def setUp(self):
