@@ -42,5 +42,4 @@ Note: the `grpc_*` metrics will just show commented out (with their descriptions
 
 - add stream support
 - add client metrics
-- add test
 - add example
