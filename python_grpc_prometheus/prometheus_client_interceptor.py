@@ -12,6 +12,8 @@ from python_grpc_prometheus import util
 from python_grpc_prometheus.util import split_call_details
 from python_grpc_prometheus.util import code_to_string
 
+_ = CLIENT_MSG_RECEIVED_TOTAL
+
 
 class PromClientInterceptor(grpc.UnaryUnaryClientInterceptor, grpc.UnaryStreamClientInterceptor,
                             grpc.StreamUnaryClientInterceptor,
