@@ -38,6 +38,15 @@ GRPC_STATUS_CODE_TO_STRING = {
 }
 
 
+def split_call_details(details, minimum_grpc_method_path_items=3):
+    parts = details.method.split("/")
+    if len(parts) < minimum_grpc_method_path_items:
+        return '', '', False
+
+    grpc_service, grpc_method = parts[1:minimum_grpc_method_path_items]
+    return grpc_service, grpc_method, True
+
+
 def code_to_string(code):
     if code is None:
         return None
