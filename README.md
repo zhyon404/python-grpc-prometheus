@@ -1,5 +1,7 @@
 # python-grpc-prometheus
 
+similar to https://github.com/grpc-ecosystem/go-grpc-prometheus in python. 
+
 <a href="https://travis-ci.org/zhyon404/python-grpc-prometheus"><img src="https://travis-ci.org/zhyon404/python-grpc-prometheus.svg?branch=master" alt="Build Status"></img></a>
 
 
